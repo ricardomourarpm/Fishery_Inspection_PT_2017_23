@@ -1,15 +1,19 @@
 import pandas as pd
 import numpy as np
 
+# Read data
 df = pd.read_pickle(r'data\final_fiscrep_deleted.pickle')
 
+# Save original data
 o_df = df.copy()
 
 # Create a new DataFrame for unique values of CFR
 matched_CFR = pd.DataFrame(df.matched_CFR.unique(), columns=['CFR'])
 
+# Rename columns
 df.rename(columns = {'matched_CFR':'CFR', 'Vessel_Type_y':'Vessel_Type'}, inplace = True)
 
+# Just disclose years
 df['Date of entry into service'] = df['Date of entry into service'].apply(lambda x: int(x.year) if not pd.isnull(x) else np.nan)
 
 df['Year of construction'] = df['Year of construction'].apply(lambda x: int(x.year) if not pd.isnull(x) else np.nan)
@@ -34,19 +38,22 @@ df = df.drop(columns=['Place of registration',#not necessary
 
 
 
-seed_r = 100
+seed_r = 1 # Value not used for anonymization since it should be disclosed for identification protection.
 
 np.random.seed(seed_r)
 alpha = np.random.uniform(0.2,0.4)
 
+# Random Noise Addition
 sigma_date = np.std([x for x in df['Date of entry into service'] if not pd.isnull(x)])
 
 sigma_year = np.std([x for x in df['Year of construction'] if not pd.isnull(x)])
+
 np.random.seed(seed_r)
 df['Date of entry into service'] = df['Date of entry into service'].apply(lambda x: np.round(np.random.normal(loc=x, scale=alpha*sigma_date),0) if not pd.isnull(x) else np.nan)
 np.random.seed(seed_r)
 df['Year of construction'] = df['Year of construction'].apply(lambda x: np.round(np.random.normal(loc=x, scale=alpha*sigma_year),0) if not pd.isnull(x) else np.nan)
 
+# Noise Addition
 sigma_LOA = df['LOA'].std()
 
 sigma_LBP = df['LBP'].std()
@@ -59,9 +66,13 @@ df['LOA'] = [loa if loa>0 else o_df.LOA.min() if loa==0 else np.abs(loa) for loa
 
 df['LBP'] = [lbp if lbp>0 else o_df.LBP.min() if lbp==0 else np.abs(lbp) for lbp in df['LBP']]
 
+#Rounding
+
 df['Power of auxiliary engine'] = (df['Power of auxiliary engine']/10).round()*10
 
 df['Other tonnage'] = df['Other tonnage'].round()
+
+#Noise Addition
 
 sigma_power = df['Power of main engine'].std()
 np.random.seed(seed_r)
@@ -182,12 +193,12 @@ plt.show()
 
 
 
-
+# load previous fk and Fk = 1 identifiers and alter
 save_for_suppress = pd.read_pickle(r'data\supress.pickle')
 
 save_for_suppress = set(save_for_suppress.CFR)
 
-variables = ['Other tonnage', 'Vessel_Type', 'Vessel_Type', 'Vessel_Type', 'Power of auxiliary engine','Vessel_Type']
+variables = ['Other tonnage'] # Vector of variables for example. Real one disclosed for protection.
 
 index_supress = 0
 for CFR in save_for_suppress:
@@ -212,7 +223,7 @@ save_for_suppress2 = pd.read_pickle(r'data\supress2.pickle')
 
 save_for_suppress = set(save_for_suppress2.CFR)
 
-variables = ['Power of auxiliary engine', 'Other tonnage']
+variables = ['Other tonnage'] # Vector of variables for example. Real one disclosed for protection.
 
 index_supress = 0
 for CFR in save_for_suppress:
@@ -384,7 +395,7 @@ plt.grid(True)
 
 plt.show()
 
-# some other preprocessing detected after
+# some other preprocessing detected made after
 df.drop(columns=['Vessel_Type_x', 'Infrac_a','local'], inplace=True)
 
 df['Result'].replace('TODOS', 'LEGAL', inplace=True)
@@ -397,5 +408,3 @@ df.to_csv(r'data\final_fiscrep_anonimized.csv')
 
 o_df.to_pickle(r'data\final_fiscrep_original.pickle')
 o_df.to_csv(r'data\final_fiscrep_original.csv')
-
-df
