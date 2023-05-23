@@ -34,7 +34,7 @@ CFR_match = last_cfr_data[common_cols+['CFR']]
 
 #df['Year of construction'] = df['Year of construction'].apply(lambda x: np.round(x.year/10)*10 if not pd.isnull(x) else np.nan)
 
-seed_r = 100
+seed_r = 0 ####This value was not the one used to randomly create the alpha and the other values in the dataset, disclosed for protection
 
 np.random.seed(seed_r)
 alpha = np.random.uniform(0.2,0.4)
@@ -303,7 +303,7 @@ pd.DataFrame(save_for_suppress,columns=['CFR']).to_pickle(r'data\supress.pickle'
 
 save_for_suppress = set(save_for_suppress)
 
-variables = ['Other tonnage', 'Vessel Type', 'Vessel Type', 'Vessel Type', 'Power of auxiliary engine','Vessel Type']
+variables = ['Other tonnage'] ## One more time this was not the vector of variables changed. Disclosed for protection.
 
 index_supress = 0
 for CFR in save_for_suppress:
@@ -478,7 +478,7 @@ save_for_suppress = set(save_for_suppress)
 
 print(save_for_suppress)
 
-variables = ['Vessel Type', 'Other tonnage','Power of auxiliary engine','Vessel Type']
+variables = ['Other tonnage'] ## One more time this was not the vector of variables changed. Disclosed for protection.
 
 index_supress = 0
 for CFR in save_for_suppress:
